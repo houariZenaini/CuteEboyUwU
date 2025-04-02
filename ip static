@@ -1,0 +1,19 @@
+# Définir les variables
+$InterfaceAlias = (Get-NetAdapter | Where-Object { $_.Status -eq "Up" }).InterfaceAlias
+$IPAddress = "192.168.1.100"
+$SubnetMask = "255.255.255.0"
+$DefaultGateway = "192.168.1.1"
+$DNSServers = @("8.8.8.8", "8.8.4.4")
+
+# Supprimer toute adresse IP existante
+Remove-NetIPAddress -InterfaceAlias $InterfaceAlias -Confirm:$false -ErrorAction SilentlyContinue
+
+# Définir la nouvelle adresse IP et le masque de sous-réseau
+New-NetIPAddress -InterfaceAlias $InterfaceAlias -IPAddress $IPAddress -PrefixLength ($SubnetMask -split "\." | ForEach-Object { [convert]::ToString($_,2).Length -join "" }).Length -DefaultGateway $DefaultGateway
+
+# Configurer les serveurs DNS
+Set-DnsClientServerAddress -InterfaceAlias $InterfaceAlias -ServerAddresses $DNSServers
+
+# Vérifier la configuration
+Get-NetIPAddress -InterfaceAlias $InterfaceAlias
+Get-DnsClientServerAddress -InterfaceAlias $InterfaceAlias
