@@ -1,0 +1,60 @@
+# Vérifie si le module Active Directory est installé
+Import-Module ServerManager
+
+# Installation du rôle AD DS
+Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+
+# Promotion du serveur en tant que contrôleur de domaine
+$DomainName = "mondomaine.local"
+$SafeModePassword = ConvertTo-SecureString "P@ssw0rd123" -AsPlainText -Force
+
+Install-ADDSForest `
+    -DomainName $DomainName `
+    -CreateDnsDelegation:$false `
+    -DatabasePath "C:\Windows\NTDS" `
+    -DomainMode Win2016 `
+    -ForestMode Win2016 `
+    -InstallDns:$true `
+    -LogPath "C:\Windows\NTDS" `
+    -SysvolPath "C:\Windows\SYSVOL" `
+    -NoRebootOnCompletion:$false `
+    -SafeModeAdministratorPassword $SafeModePassword `
+    -Force:$true
+
+# Attente du redémarrage après la promotion
+Start-Sleep -Seconds 120
+
+# Reconnexion après redémarrage
+Import-Module ActiveDirectory
+
+# Définition du domaine
+$Domain = (Get-ADDomain).DistinguishedName
+
+# Création des Unités Organisationnelles (OU)
+$OUs = @("IT", "RH", "Comptabilite")
+foreach ($OU in $OUs) {
+    New-ADOrganizationalUnit -Name $OU -Path $Domain -ProtectedFromAccidentalDeletion $false -ErrorAction SilentlyContinue
+}
+
+# Création des utilisateurs avec des mots de passe par défaut
+$Users = @(
+    @{Name="Jean Dupont"; UserName="jdupont"; OU="IT"},
+    @{Name="Marie Curie"; UserName="mcurie"; OU="RH"},
+    @{Name="Albert Einstein"; UserName="aeinstein"; OU="Comptabilite"}
+)
+
+$DefaultPassword = ConvertTo-SecureString "P@ssw0rd123" -AsPlainText -Force
+
+foreach ($User in $Users) {
+    $OUPath = "OU=$($User.OU),$Domain"
+    New-ADUser -Name $User.Name `
+               -GivenName $User.Name.Split(" ")[0] `
+               -Surname $User.Name.Split(" ")[1] `
+               -SamAccountName $User.UserName `
+               -UserPrincipalName "$($User.UserName)@$((Get-ADDomain).Forest)" `
+               -Path $OUPath `
+               -AccountPassword $DefaultPassword `
+               -Enabled $true `
+               -ChangePasswordAtLogon $true `
+               -PassThru
+}
