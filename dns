@@ -1,0 +1,35 @@
+# Définir les variables
+$ZoneName = "mondomaine.local"   # Remplace par ton domaine
+$NetworkID = "192.168.1"         # Adresse réseau (sans le dernier octet)
+$ReverseZone = "1.168.192.in-addr.arpa"  # Zone inverse (adaptée à ton réseau)
+$HostName = "serveur01"          # Nom de la machine à ajouter
+$HostIP = "192.168.1.100"        # IP de la machine
+
+# Vérifier si le rôle DNS est installé, sinon l'installer
+if (!(Get-WindowsFeature -Name DNS -ErrorAction SilentlyContinue).Installed) {
+    Install-WindowsFeature -Name DNS -IncludeManagementTools
+}
+
+# Ajouter une zone de recherche directe si elle n'existe pas
+if (!(Get-DnsServerZone -Name $ZoneName -ErrorAction SilentlyContinue)) {
+    Add-DnsServerPrimaryZone -Name $ZoneName -ZoneFile "$ZoneName.dns"
+}
+
+# Ajouter une zone de recherche inversée si elle n'existe pas
+if (!(Get-DnsServerZone -Name $ReverseZone -ErrorAction SilentlyContinue)) {
+    Add-DnsServerPrimaryZone -NetworkId $NetworkID -ReplicationScope "Forest"
+}
+
+# Ajouter un enregistrement A pour un serveur
+Add-DnsServerResourceRecordA -ZoneName $ZoneName -Name $HostName -IPv4Address $HostIP -TimeToLive 01:00:00
+
+# Ajouter un enregistrement PTR pour la résolution inverse
+Add-DnsServerResourceRecordPTR -ZoneName $ReverseZone -Name ($HostIP -split "\.")[3] -PtrDomainName "$HostName.$ZoneName"
+
+# Redémarrer le service DNS
+Restart-Service DNS
+
+# Vérifier la configuration
+Get-DnsServerZone
+Get-DnsServerResourceRecord -ZoneName $ZoneName
+Get-DnsServerResourceRecord -ZoneName $ReverseZone
