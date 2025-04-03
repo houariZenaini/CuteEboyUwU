@@ -1,0 +1,40 @@
+# Outils de base
+curl
+wget
+git
+vim
+nano
+htop
+tmux
+
+# Dev
+build-essential
+python3
+python3-pip
+nodejs
+npm
+
+# Réseau
+net-tools
+openssh-server
+fail2ban
+ufw
+
+# autre utile
+zip
+unzip
+p7zip-full
+rar
+unrar
+
+# Outils sys
+neofetch
+tree
+jq
+screenfetch
+
+# Virtualisation & Conteneurs
+docker.io
+docker-compose
+virt-manager
+qemu-kvm
