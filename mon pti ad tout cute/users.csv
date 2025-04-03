@@ -1,4 +1,0 @@
-SamAccountName,Name,FirstName,LastName,Password,OU,Group
-jdoe,John Doe,John,Doe,P@ssw0rd,OU=Utilisateurs,DC=monentreprise,DC=local,IT-Admins
-asmith,Karis Smith,houari,hicham,Secure123,OU=Utilisateurs,DC=monentreprise,DC=local,IT-Support
-mamadou,Moah,iness,Karim,Boubacar,Passw0rd!,OU=RH,DC=monentreprise,DC=local,RH
