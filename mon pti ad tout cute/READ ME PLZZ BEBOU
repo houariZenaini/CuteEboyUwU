@@ -1,0 +1,26 @@
+Script de Création d'Utilisateurs Active Directory
+
+Description
+créer des utilisateurs Active Directory à partir d’un fichier CSV.  
+
+
+- `create_users.ps1`  Script PowerShell pour créer les utilisateurs dans l'AD  
+- `users.csv`  Liste des utilisateurs à créer  
+- `README.md`  Documentation  
+
+## 🔧 Prérequis
+- Windows Server avec Active Directory  
+- Module RSAT-AD-PowerShell installé  
+- Un fichier CSV contenant la liste des utilisateurs  
+
+
+-------------------------------------
+
+1. Modifier le fichier `users.csv`  
+   Remplissez le fichier `users.csv` avec les informations des utilisateurs. (dans mon ca j'ai déjà un csv generique)
+
+2. Ouvrir une console PowerShell en mode Administrateur  
+
+3. Exécuter le script PowerShell  
+   ```powershell
+   .create_users.ps1
