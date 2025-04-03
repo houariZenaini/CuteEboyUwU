@@ -1,0 +1,24 @@
+
+include "/usr/share/nano/*.nanorc"
+
+set linenumbers
+
+set smarthome
+
+set softwrap
+
+set backup
+
+set mouse
+
+set tabsize 4
+set autoindent
+set tabstospaces
+
+set whitespace "all"
+
+set constantshow
+
+set help
+
+unset allow_insecure_backup
